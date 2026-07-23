@@ -2,13 +2,15 @@
 node_modules/
 dist/
 
-# Environment files
+# Environment files (local only — CI/CD injects via pipeline)
 .env
-*.env
-!api/config/.env.example
-!front/.env.example
-!front/.env.development
-!front/.env.production
+.env.local
+.env.development
+.env.production
+.env.staging
+
+# Environment examples (tracked)
+!*.example
 
 # IDE
 .vscode/
