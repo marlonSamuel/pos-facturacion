@@ -6,6 +6,9 @@ dist/
 .env
 *.env
 !api/config/.env.example
+!front/.env.example
+!front/.env.development
+!front/.env.production
 
 # IDE
 .vscode/
