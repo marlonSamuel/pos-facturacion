@@ -4,9 +4,8 @@ dist/
 
 # Environment files
 .env
-!api/config/development.env
-api/config/production.env
-api/config/staging.env
+*.env
+!api/config/.env.example
 
 # IDE
 .vscode/
