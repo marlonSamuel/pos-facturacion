@@ -1,0 +1,63 @@
+{
+  "name": "new-horizon-api",
+  "version": "1.0.0",
+  "description": "API REST para New Horizon - Sistema de Inventarios y Facturación DTE",
+  "main": "dist/app.js",
+  "scripts": {
+    "start": "ts-node src/app.ts",
+    "start:dev": "tsnd --respawn src/app.ts",
+    "build": "tsc",
+    "migration:generate": "node ./node_modules/sequelize-cli/lib/sequelize migration:generate --name",
+    "migration:run": "node ./node_modules/sequelize-cli/lib/sequelize db:migrate",
+    "migration:undo": "node ./node_modules/sequelize-cli/lib/sequelize db:migrate:undo",
+    "seed:generate": "node ./node_modules/sequelize-cli/lib/sequelize seed:generate --name",
+    "seed:run": "node ./node_modules/sequelize-cli/lib/sequelize db:seed:all",
+    "db:reset": "node ./node_modules/sequelize-cli/lib/sequelize db:migrate:undo:all && node ./node_modules/sequelize-cli/lib/sequelize db:migrate && node ./node_modules/sequelize-cli/lib/sequelize db:seed:all",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "keywords": [
+    "new-horizon",
+    "inventarios",
+    "dte",
+    "sat"
+  ],
+  "author": "New Horizon",
+  "license": "ISC",
+  "dependencies": {
+    "awilix": "^13.0.5",
+    "awilix-express": "^11.0.1",
+    "axios": "^1.18.1",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "exceljs": "^4.4.0",
+    "express": "^5.2.1",
+    "express-jwt": "^8.5.1",
+    "express-validator": "^7.3.2",
+    "jsonwebtoken": "^9.0.3",
+    "moment": "^2.30.1",
+    "multer": "^2.2.0",
+    "mysql2": "^3.23.0",
+    "pdfkit": "^0.19.1",
+    "sequelize": "^6.37.8",
+    "ts-node": "^10.9.2",
+    "uuid": "^14.0.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.2.0",
+    "@types/node": "^26.1.1",
+    "@types/pdfkit": "^0.17.6",
+    "@types/uuid": "^10.0.0",
+    "jest": "^30.4.2",
+    "sequelize-cli": "^6.6.5",
+    "ts-jest": "^29.4.11",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.3"
+  }
+}

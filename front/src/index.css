@@ -1,0 +1,29 @@
+:root {
+  --sidebar-bg: #0a1929;
+  --blue-dark: #0a1929;
+  --blue-primary: #1565c0;
+}
+
+/* Sidebar: fondo oscuro consistente en menú y submenús */
+.ant-menu-dark.ant-menu-root,
+.ant-menu-dark .ant-menu-sub,
+.ant-menu-dark .ant-menu-item,
+.ant-menu-dark .ant-menu-submenu-title {
+  background: transparent !important;
+}
+
+.ant-menu-dark .ant-menu-item-selected {
+  background-color: #1565c0 !important;
+}
+
+.ant-menu-dark .ant-menu-item-active,
+.ant-menu-dark .ant-menu-submenu-active {
+  background-color: rgba(21, 101, 192, 0.15) !important;
+}
+
+/* Ocultar nombre de usuario en el header cuando la pantalla es muy pequeña */
+@media (max-width: 480px) {
+  .header-username {
+    display: none;
+  }
+}

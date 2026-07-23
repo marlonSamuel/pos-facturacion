@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dte:GTDocumento xmlns:dte="http://www.sat.gob.gt/dte/fel/0.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="0.1">
+  <dte:SAT ClaseDocumento="dte">
+    <dte:DTE ID="DatosCertificados">
+      <dte:DatosEmision ID="DatosEmision">
+        <dte:DatosGenerales Tipo="FACT" FechaHoraEmision="2026-07-16T17:00:00" CodigoMoneda="GTQ" />
+        <dte:Emisor NITEmisor="44235216" NombreEmisor="NELSON MAEL, GONZÁLEZ SOLARES" CodigoEstablecimiento="1" NombreComercial="NEW HORIZON" AfiliacionIVA="GEN">
+          <dte:DireccionEmisor>
+            <dte:Direccion>AVENIDA PRINCIPAL BARRIO EL CAMPAMENTO zona 0</dte:Direccion>
+            <dte:CodigoPostal>06008</dte:CodigoPostal>
+            <dte:Municipio>Chiquimulilla</dte:Municipio>
+            <dte:Departamento>Santa Rosa</dte:Departamento>
+            <dte:Pais>GT</dte:Pais>
+          </dte:DireccionEmisor>
+        </dte:Emisor>
+        <dte:Receptor NombreReceptor="Plan anual de natación 2026" CorreoReceptor="" IDReceptor="101771932">
+          <dte:DireccionReceptor>
+            <dte:Direccion>dasdfasdf</dte:Direccion>
+            <dte:CodigoPostal>0</dte:CodigoPostal>
+            <dte:Municipio>Chiquimulilla</dte:Municipio>
+            <dte:Departamento>Santa Rosa</dte:Departamento>
+            <dte:Pais>GT</dte:Pais>
+          </dte:DireccionReceptor>
+        </dte:Receptor>
+        <dte:Frases>
+          <dte:Frase TipoFrase="1" CodigoEscenario="1" />
+        </dte:Frases>
+        <dte:Items>
+        </dte:Items>
+        <dte:Totales>
+          <dte:TotalImpuestos>
+            <dte:TotalImpuesto NombreCorto="IVA" TotalMontoImpuesto="0" />
+          </dte:TotalImpuestos>
+          <dte:GranTotal>0</dte:GranTotal>
+        </dte:Totales>
+      </dte:DatosEmision>
+    </dte:DTE>
+    <dte:Adenda>
+      <dtecomm:Informacion_COMERCIAL xmlns:dtecomm="https://www.digifact.com.gt/dtecomm" xsi:schemaLocation="https://www.digifact.com.gt/dtecomm">
+        <dtecomm:InformacionAdicional Version="2020_06_01">
+          <dtecomm:REFERENCIA_INTERNA>INVOICE12</dtecomm:REFERENCIA_INTERNA>
+          <dtecomm:FECHA_REFERENCIA>2026-07-16T17:00:00</dtecomm:FECHA_REFERENCIA>
+          <dtecomm:VALIDAR_REFERENCIA_INTERNA>VALIDAR</dtecomm:VALIDAR_REFERENCIA_INTERNA>
+        </dtecomm:InformacionAdicional>
+      </dtecomm:Informacion_COMERCIAL>
+    </dte:Adenda>
+  </dte:SAT>
+</dte:GTDocumento>

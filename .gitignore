@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+dist/
+
+# Environment files
+.env
+!api/config/development.env
+api/config/production.env
+api/config/staging.env
+
+# IDE
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Uploads (generated)
+api/uploads/facturas/
+api/uploads/products/
+api/uploads/users/
+
+# Tests
+api/coverage/
+
+# Temp scripts
+api/_reset_pwd.cjs
+
+# Build artifacts
+front/dist/
