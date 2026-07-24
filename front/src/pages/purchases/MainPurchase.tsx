@@ -19,8 +19,8 @@ export const MainPurchase = () => {
   const [selectedArticle, setSelectedArticle] = useState<number | undefined>(undefined);
   const [qty, setQty] = useState(1);
   const [priceBuy, setPriceBuy] = useState<number>(0);
-  const [priceSell, setPriceSell] = useState<number>(0);
   const [saving, setSaving] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [articleNames, setArticleNames] = useState<Record<number, string>>({});
   const screens = useBreakpoint();
   const isMobile = !screens.md;
@@ -38,7 +38,6 @@ export const MainPurchase = () => {
     if (!selectedArticle) { message.warning('Seleccione un artículo'); return; }
     if (qty < 1) { message.warning('Cantidad inválida'); return; }
     if (priceBuy <= 0) { message.warning('Precio compra inválido'); return; }
-    if (priceSell <= 0) { message.warning('Precio venta inválido'); return; }
 
     addItem({
       idarticulo: selectedArticle,
@@ -46,14 +45,12 @@ export const MainPurchase = () => {
       codigo: '',
       cantidad: qty,
       precio_compra: priceBuy,
-      precio_venta: priceSell,
       subtotal: qty * priceBuy
     });
 
     setSelectedArticle(undefined);
     setQty(1);
     setPriceBuy(0);
-    setPriceSell(0);
     if (artRef.current) artRef.current.focus();
   };
 
@@ -63,7 +60,6 @@ export const MainPurchase = () => {
       if (cartItems.length === 0) { message.warning('Agregue al menos un artículo'); return; }
       if (cartItems.some(i => i.cantidad <= 0)) { message.warning('Cantidad inválida en uno de los artículos'); return; }
       if (cartItems.some(i => i.precio_compra <= 0)) { message.warning('Precio de compra inválido en uno de los artículos'); return; }
-      if (cartItems.some(i => i.precio_venta <= 0)) { message.warning('Precio de venta inválido en uno de los artículos'); return; }
       if (total <= 0) { message.warning('El total de la compra debe ser mayor a cero'); return; }
 
       setSaving(true);
@@ -79,7 +75,6 @@ export const MainPurchase = () => {
           idarticulo: item.idarticulo,
           cantidad: item.cantidad,
           precio_compra: item.precio_compra,
-          precio_venta: item.precio_venta
         }))
       };
 
@@ -87,6 +82,7 @@ export const MainPurchase = () => {
       if (ok) {
         clear();
         form.resetFields();
+        setRefreshKey(k => k + 1);
       }
     } finally {
       setSaving(false);
@@ -158,6 +154,7 @@ export const MainPurchase = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <Text type="secondary" style={{ fontSize: 11 }}>Artículo</Text>
           <InlineArticleSelect
+            key={refreshKey}
             value={selectedArticle}
             excludeIds={cartItems.map(i => i.idarticulo)}
             onChange={async v => {
@@ -187,13 +184,6 @@ export const MainPurchase = () => {
           <Text type="secondary" style={{ fontSize: 11 }}>P. Compra (Q)</Text>
           <InputNumber placeholder="0.00" min={0.01} step={0.01}
             value={priceBuy} onChange={v => setPriceBuy(v || 0)} style={{ width: '100%' }} />
-        </div>
-      </Col>
-      <Col xs={8} sm={4} md={3}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <Text type="secondary" style={{ fontSize: 11 }}>P. Venta (Q)</Text>
-          <InputNumber placeholder="0.00" min={0.01} step={0.01}
-            value={priceSell} onChange={v => setPriceSell(v || 0)} style={{ width: '100%' }} />
         </div>
       </Col>
 

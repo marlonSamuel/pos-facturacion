@@ -149,6 +149,14 @@ export const ArticleList = ({ items, loading, total, page, pageSize, onPageChang
       ) : <Text type="secondary">—</Text>
     },
     { title: 'Nombre', dataIndex: 'nombre', key: 'nombre', sorter: (a: IArticle, b: IArticle) => (a.nombre || '').localeCompare(b.nombre || '') },
+    { title: 'Precio', dataIndex: 'precio_venta', key: 'precio', width: 90, align: 'right' as const,
+      render: (v: number) => v ? `Q${Number(v).toFixed(2)}` : '-',
+      sorter: (a: IArticle, b: IArticle) => (a.precio_venta || 0) - (b.precio_venta || 0)
+    },
+    { title: 'Stock', dataIndex: 'stock', key: 'stock', width: 60, align: 'center' as const,
+      render: (v: number) => <Text>{v ?? '-'}</Text>,
+      sorter: (a: IArticle, b: IArticle) => (a.stock || 0) - (b.stock || 0)
+    },
     { title: 'Categoría', key: 'categoria', width: 120, sorter: (a: IArticle, b: IArticle) => sorterStr(a, b, 'categoria'),
       render: (_: any, r: IArticle) => (r.categoria as any)?.nombre },
     {

@@ -201,13 +201,14 @@
 
 | Suites | Tests | Status |
 |--------|-------|--------|
-| **13 suites** | **156 ✅** | **0 fallos** |
+| **14 suites** | **161 ✅** | **0 fallos** |
 
 ### Tests agregados (fecha: 2026-07-23)
 
 | Archivo | Tests nuevos | Descripción |
 |---------|-------------|-------------|
 | `DteService.test.ts` | +2 | Token refresh (reuse ≥15min, refresh <15min) |
+| `ArticleService.test.ts` | +1 | Rollback transaccional al crear artículo con stock |
 | `SaleService.test.ts` | +2 | Cancel con/sin motivo, verifica persistencia |
 | `ReportsService.test.ts` | +8 | Estado filter en sales/purchases/dte + motivo_anulacion |
 

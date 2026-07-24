@@ -2,7 +2,6 @@ export interface IDetalleIngresoDto {
   idarticulo: number;
   cantidad: number;
   precio_compra: number;
-  precio_venta: number;
 }
 
 export interface IIngresoDto {
@@ -39,5 +38,4 @@ export interface IDetalleIngresoResponse {
   articulo?: string;
   cantidad: number;
   precio_compra: number;
-  precio_venta: number;
 }

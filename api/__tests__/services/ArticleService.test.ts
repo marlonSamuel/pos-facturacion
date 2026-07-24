@@ -30,6 +30,7 @@ jest.mock('../../src/common/database/mysql', () => ({
   sequelize: {
     query: jest.fn(),
     literal: jest.fn((val: string) => val),
+    transaction: jest.fn(),
   },
 }));
 
@@ -123,7 +124,7 @@ describe('getLastPurchasePrice', () => {
   it('debe retornar ultimo precio de compra', async () => {
     mockQuery.mockResolvedValue([{ precio_compra: 50, precio_venta: 75 }]);
     const result = await service.getLastPurchasePrice(1);
-    expect(result).toEqual({ precio_compra: 50, precio_venta: 75 });
+    expect(result).toEqual({ precio_compra: 50, precio_venta: null });
   });
 
   it('debe retornar null si no hay compras previas', async () => {
@@ -148,18 +149,32 @@ describe('getById', () => {
 });
 
 describe('create', () => {
+  const mockTransaction = { commit: jest.fn(), rollback: jest.fn() };
+
+  beforeEach(() => {
+    (sequelize.transaction as jest.Mock).mockResolvedValue(mockTransaction);
+  });
+
   it('debe crear articulo sin imagen', async () => {
     const data = { nombre: 'Nuevo', idcategoria: 1, codigo: '123', precio_venta: 50 };
     (mockArticulo.create as jest.Mock).mockResolvedValue({ idarticulo: 1, ...data });
     await service.create(data as any);
-    expect(mockArticulo.create).toHaveBeenCalledWith({ idcomercio: 1, ...data });
+    expect(mockArticulo.create).toHaveBeenCalledWith(
+      { idcomercio: 1, ...data },
+      expect.objectContaining({})
+    );
+    expect(mockTransaction.commit).toHaveBeenCalled();
   });
 
   it('debe crear articulo con imagen', async () => {
     const data = { nombre: 'Nuevo', idcategoria: 1, precio_venta: 50 };
     (mockArticulo.create as jest.Mock).mockResolvedValue({ idarticulo: 1, ...data, imagen: 'foto.jpg' });
     await service.create(data as any, 'foto.jpg');
-    expect(mockArticulo.create).toHaveBeenCalledWith({ idcomercio: 1, ...data, imagen: 'foto.jpg' });
+    expect(mockArticulo.create).toHaveBeenCalledWith(
+      { idcomercio: 1, ...data, imagen: 'foto.jpg' },
+      expect.objectContaining({})
+    );
+    expect(mockTransaction.commit).toHaveBeenCalled();
   });
 
   it('debe eliminar stock del payload si se envia', async () => {
@@ -169,6 +184,16 @@ describe('create', () => {
     const callArg = (mockArticulo.create as jest.Mock).mock.calls[0][0];
     expect(callArg.stock).toBeUndefined();
     expect(callArg.idcomercio).toBe(1);
+    expect(mockTransaction.commit).toHaveBeenCalled();
+  });
+
+  it('debe hacer rollback si falla la creacion de stock', async () => {
+    const data = { nombre: 'Nuevo', idcategoria: 1, precio_venta: 50, stock: 10 };
+    (mockArticulo.create as jest.Mock).mockResolvedValue({ idarticulo: 1, ...data });
+    (ArticuloSucursal.create as jest.Mock).mockRejectedValue(new Error('DB error'));
+    await expect(service.create(data as any)).rejects.toThrow('DB error');
+    expect(mockTransaction.rollback).toHaveBeenCalled();
+    expect(mockTransaction.commit).not.toHaveBeenCalled();
   });
 });
 

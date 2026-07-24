@@ -32,7 +32,7 @@
 | **venta** | `idventa` | idcliente, idusuario, tipo_comprobante, serie, numero, fecha_hora, total_venta, estado, **idsucursal**, motivo_anulacion VARCHAR(100) NULL |
 | **detalle_venta** | `iddetalle_venta` | idventa (FK), idarticulo (FK), cantidad, precio_venta, descuento |
 | **ingreso** | `idingreso` | idproveedor, idusuario, tipo_comprobante, serie, numero, fecha_hora, total_compra, estado, **idsucursal**, motivo_anulacion VARCHAR(100) NULL |
-| **detalle_ingreso** | `iddetalle_ingreso` | idingreso (FK), idarticulo (FK), cantidad, precio_compra, precio_venta |
+| **detalle_ingreso** | `iddetalle_ingreso` | idingreso (FK), idarticulo (FK), cantidad, precio_compra |
 
 ### Tablas de Usuarios y Roles
 

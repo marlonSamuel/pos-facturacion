@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { Button, Card, Col, Form, Input, Row, Typography, App, Spin } from 'antd';
+import { Button, Card, Col, Form, Input, Row, Typography, App, Spin, Result } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { AuthContext } from '../../context/auth/AuthContext';
 import { authService } from '../../services/authService';
@@ -7,6 +7,7 @@ import type { IComercioPublicInfo } from '../../interfaces/IAuth';
 
 const { Text, Title } = Typography;
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace('/api', '');
+const SLUG = (import.meta.env.VITE_COMERCIO_SLUG as string) || null;
 
 export const LoginPage = () => {
   const { notification } = App.useApp();
@@ -14,12 +15,17 @@ export const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [comercio, setComercio] = useState<IComercioPublicInfo | null>(null);
   const [brandLoading, setBrandLoading] = useState(true);
+  const [slugError, setSlugError] = useState(false);
 
   useEffect(() => {
-    const slug = import.meta.env.VITE_COMERCIO_SLUG as string || 'new-horizon';
-    authService.getComercioInfo(slug)
+    if (!SLUG) {
+      setSlugError(true);
+      setBrandLoading(false);
+      return;
+    }
+    authService.getComercioInfo(SLUG)
       .then(setComercio)
-      .catch(() => setComercio(null))
+      .catch(() => { setSlugError(true); setComercio(null); })
       .finally(() => setBrandLoading(false));
   }, []);
 
@@ -38,8 +44,23 @@ export const LoginPage = () => {
 
   const onFinish = async (values: { username: string; password: string }) => {
     setLoading(true);
-    await login(values);
+    await login({ ...values, slug: SLUG || undefined });
   };
+
+  // Pantalla de error si no se detecta comercio
+  if (slugError) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f0f2f5' }}>
+        <Card style={{ maxWidth: 480, textAlign: 'center', borderRadius: 12 }}>
+          <Result
+            status="404"
+            title="Comercio no encontrado"
+            subTitle="No se pudo identificar el comercio. Verifique la URL o contacte al administrador."
+          />
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div style={styles.container}>

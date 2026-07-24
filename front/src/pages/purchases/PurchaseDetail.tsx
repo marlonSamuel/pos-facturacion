@@ -16,8 +16,6 @@ export const PurchaseDetail = ({ open, data, loading, onCancel }: Props) => {
     { title: 'Cantidad', dataIndex: 'cantidad', key: 'cantidad', width: 90 },
     { title: 'P. Compra', dataIndex: 'precio_compra', key: 'precio_compra', width: 110,
       render: (v: number) => `Q${Number(v).toFixed(2)}` },
-    { title: 'P. Venta', dataIndex: 'precio_venta', key: 'precio_venta', width: 110,
-      render: (v: number) => `Q${Number(v).toFixed(2)}` },
     { title: 'Subtotal', key: 'subtotal', width: 110,
       render: (_: any, r: any) => `Q${(r.cantidad * r.precio_compra).toFixed(2)}` }
   ];

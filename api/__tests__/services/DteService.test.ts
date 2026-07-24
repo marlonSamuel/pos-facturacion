@@ -220,7 +220,7 @@ describe('getToken', () => {
     // Verificar que busca el token de la sucursal activa
     expect(mockTokenDteFindOne).toHaveBeenCalledWith(
       expect.objectContaining({ 
-        where: expect.objectContaining({ idsucursal: 1, otorgado_a: 'GT.000044653948.PRUEBAS56' }) 
+        where: expect.objectContaining({ idsucursal: 1 }) 
       })
     );
   });

@@ -1,6 +1,7 @@
 export interface ILoginData {
   username: string;
   password: string;
+  slug?: string;
 }
 
 export interface IUser {

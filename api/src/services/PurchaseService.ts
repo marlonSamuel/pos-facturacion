@@ -83,9 +83,6 @@ export class PurchaseService {
       if (!det.precio_compra || det.precio_compra <= 0) {
         throw new ApplicationException('El precio de compra de cada artículo debe ser mayor a cero');
       }
-      if (!det.precio_venta || det.precio_venta <= 0) {
-        throw new ApplicationException('El precio de venta de cada artículo debe ser mayor a cero');
-      }
     }
     const transaction = await sequelize.transaction();
     try {
@@ -113,7 +110,6 @@ export class PurchaseService {
           idarticulo: det.idarticulo,
           cantidad: det.cantidad,
           precio_compra: det.precio_compra,
-          precio_venta: det.precio_venta
         } as any, { transaction });
         // Actualizar stock (+ cantidad) en sucursal activa
         const sucId = getSucursalId();

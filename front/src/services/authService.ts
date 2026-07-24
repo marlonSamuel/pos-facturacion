@@ -17,8 +17,8 @@ export interface IRefreshResponse {
 }
 
 export const authService = {
-  async login(username: string, password: string) {
-    const r = await api.post<ILoginResponse>('/auth/login', { username, password });
+  async login(username: string, password: string, slug?: string) {
+    const r = await api.post<ILoginResponse>('/auth/login', { username, password, slug });
     return r.data;
   },
 

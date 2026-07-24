@@ -20,6 +20,7 @@ export const AuthContext = createContext({} as AuthContextProps);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
+  const slug = (import.meta.env.VITE_COMERCIO_SLUG as string) || null;
 
   useEffect(() => {
     const logged = localStorage.getItem('logged');
@@ -37,12 +38,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (payload.idsucursal) user.idsucursal = payload.idsucursal;
       } catch { /* ignora */ }
       dispatch({ type: 'login', payload: { token, user } });
-      // Cargar informaciÃ³n del comercio
-      const slug = import.meta.env.VITE_COMERCIO_SLUG as string || 'new-horizon';
-      try {
-        const info = await authService.getComercioInfo(slug);
-        if (info) dispatch({ type: 'setComercioInfo', payload: { info } });
-      } catch { /* ignora */ }
+      // Cargar información del comercio
+      if (slug) {
+        try {
+          const info = await authService.getComercioInfo(slug);
+          if (info) dispatch({ type: 'setComercioInfo', payload: { info } });
+        } catch { /* ignora */ }
+      }
     } catch {
       localStorage.removeItem('token');
       localStorage.removeItem('logged');
@@ -52,7 +54,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = useCallback(async ({ username, password }: ILoginData) => {
     try {
-      const res = await authService.login(username, password);
+      const res = await authService.login(username, password, slug || undefined);
       if (!res.ok || !res.token || !res.user) {
         dispatch({ type: 'addError', payload: res.message || 'Credenciales inválidas' });
         return false;
@@ -62,17 +64,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (res.refreshToken) {
         localStorage.setItem('refreshToken', res.refreshToken);
       }
-      dispatch({ type: 'login', payload: { token: res.token, user: res.user } });      // Cargar informaciÃ³n del comercio
-      const slug = import.meta.env.VITE_COMERCIO_SLUG as string || 'new-horizon';
-      try {
-        const info = await authService.getComercioInfo(slug);
-        if (info) dispatch({ type: 'setComercioInfo', payload: { info } });
-      } catch { /* ignora */ }      return true;
+      dispatch({ type: 'login', payload: { token: res.token, user: res.user } });
+      // Cargar información del comercio
+      if (slug) {
+        try {
+          const info = await authService.getComercioInfo(slug);
+          if (info) dispatch({ type: 'setComercioInfo', payload: { info } });
+        } catch { /* ignora */ }
+      }
+      return true;
     } catch (e: any) {
       dispatch({ type: 'addError', payload: e?.message || 'Error al iniciar sesión' });
       return false;
     }
-  }, []);
+  }, [slug]);
 
   const logout = useCallback(() => {
     dispatch({ type: 'logout' });

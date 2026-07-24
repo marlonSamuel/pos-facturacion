@@ -64,7 +64,7 @@ export class PurchaseController extends BaseController {
     body('detalles.*.idarticulo').isInt().withMessage('Artículo inválido'),
     body('detalles.*.cantidad').isInt({ min: 1 }).withMessage('Cantidad debe ser â¥ 1'),
     body('detalles.*.precio_compra').isFloat({ min: 0.01 }).withMessage('Precio compra debe ser mayor a 0'),
-    body('detalles.*.precio_venta').optional({ values: 'falsy' }).isFloat({ min: 0 }).withMessage('Precio venta debe ser â¥ 0'),
+
     validateFields
   ])
   public async create(req: AuthRequest, res: Response) {

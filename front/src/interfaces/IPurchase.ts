@@ -3,7 +3,6 @@ export interface IPurchaseDetail {
   articulo?: string;
   cantidad: number;
   precio_compra: number;
-  precio_venta: number;
 }
 
 export interface IPurchase {
@@ -29,7 +28,6 @@ export interface IPurchaseDetailFull {
   articulo?: string;
   cantidad: number;
   precio_compra: number;
-  precio_venta: number;
 }
 
 export interface ICartItem {
@@ -38,6 +36,5 @@ export interface ICartItem {
   codigo: string;
   cantidad: number;
   precio_compra: number;
-  precio_venta: number;
   subtotal: number;
 }

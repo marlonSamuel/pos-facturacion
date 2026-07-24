@@ -71,6 +71,7 @@ export const InlineArticleSelect = ({ value, onChange, placeholder, excludeIds }
         open={formOpen}
         editing={null}
         categories={categories}
+        sucursales={[]}
         onOk={handleCreated}
         onCancel={() => setFormOpen(false)}
         hideStock

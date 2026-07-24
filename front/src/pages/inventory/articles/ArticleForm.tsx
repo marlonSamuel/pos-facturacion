@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Modal, Form, Input, InputNumber, Select, Upload, Button, Typography, Row, Col } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import { Modal, Form, Input, InputNumber, Select, Upload, Button, Typography, Row, Col, Tag } from 'antd';
+import { UploadOutlined, BankOutlined } from '@ant-design/icons';
 import Barcode from 'react-barcode';
 import type { UploadFile } from 'antd';
 import type { IArticle } from '../../../interfaces/IArticle';
 import type { ICategory } from '../../../interfaces/ICategory';
+import type { ISucursalInfo } from '../../../services/sucursalService';
 
 const { Text } = Typography;
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
@@ -13,15 +14,17 @@ interface Props {
   open: boolean;
   editing: IArticle | null;
   categories: ICategory[];
+  sucursales: ISucursalInfo[];
   onOk: (formData: FormData) => Promise<void>;
   onCancel: () => void;
   hideStock?: boolean;
 }
 
-export const ArticleForm = ({ open, editing, categories, onOk, onCancel, hideStock: _hideStock }: Props) => {
+export const ArticleForm = ({ open, editing, categories, sucursales, onOk, onCancel, hideStock: _hideStock }: Props) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [loading, setLoading] = useState(false);
+  const [stockPorSucursal, setStockPorSucursal] = useState<Record<number, number>>({});
   const codigo = Form.useWatch('codigo', form);
 
   useEffect(() => {
@@ -45,7 +48,16 @@ export const ArticleForm = ({ open, editing, categories, onOk, onCancel, hideSto
     try {
       const values = await form.validateFields();
       const formData = new FormData();
-      Object.entries(values).forEach(([k, v]) => formData.append(k, String(v ?? '')));
+      Object.entries(values).forEach(([k, v]) => {
+        if (k !== 'stock') formData.append(k, String(v ?? ''));
+      });
+      // Agregar stock por sucursal
+      const stocks = Object.entries(stockPorSucursal).filter(([, s]) => s > 0);
+      if (stocks.length > 0) {
+        formData.append('stockPorSucursal', JSON.stringify(Object.fromEntries(stocks)));
+      } else if (values.stock) {
+        formData.append('stock', String(values.stock));
+      }
       if (fileList[0]?.originFileObj) {
         formData.append('imagen', fileList[0].originFileObj);
       }
@@ -53,6 +65,7 @@ export const ArticleForm = ({ open, editing, categories, onOk, onCancel, hideSto
       await onOk(formData);
       form.resetFields();
       setFileList([]);
+      setStockPorSucursal({});
     } finally {
       setLoading(false);
     }
@@ -101,11 +114,32 @@ export const ArticleForm = ({ open, editing, categories, onOk, onCancel, hideSto
               <InputNumber min={0.01} step={0.01} prefix="Q" style={{ width: '100%' }} />
             </Form.Item>
           </Col>
-          <Col xs={24} md={12}>
-            <Form.Item name="stock" label={editing ? 'Stock (solo admin)' : 'Stock Inicial'} rules={[{ required: !editing, message: 'Requerido' }]}>
-              <InputNumber min={0} step={1} precision={0} style={{ width: '100%' }} />
-            </Form.Item>
-          </Col>
+          {!editing ? (
+            <Col xs={24} md={12}>
+              <Form.Item label="Stock Inicial por Sucursal">
+                <div style={{ maxHeight: 180, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {sucursales.map(s => (
+                    <div key={s.idsucursal} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <Tag icon={<BankOutlined />} style={{ minWidth: 140, textAlign: 'left', margin: 0 }}>{s.nombre}</Tag>
+                      <InputNumber
+                        min={0} step={1} precision={0}
+                        style={{ width: '100%' }}
+                        placeholder="Stock"
+                        value={stockPorSucursal[s.idsucursal] ?? ''}
+                        onChange={v => setStockPorSucursal(prev => ({ ...prev, [s.idsucursal]: v ?? 0 }))}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </Form.Item>
+            </Col>
+          ) : (
+            <Col xs={24} md={12}>
+              <Form.Item name="stock" label="Stock (solo admin)">
+                <InputNumber min={0} step={1} precision={0} style={{ width: '100%' }} />
+              </Form.Item>
+            </Col>
+          )}
         </Row>
 
         {codigo && (

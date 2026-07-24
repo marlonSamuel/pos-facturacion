@@ -56,6 +56,7 @@ export const MainSale = () => {
   useEffect(() => {
     loadCategories();
     fetchArticles('', 'all', 0);
+    clear();
     setTimeout(() => searchRef.current?.focus(), 500);
   }, [fetchArticles]);
 
@@ -162,6 +163,11 @@ export const MainSale = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  const closeResultModal = () => {
+    setResultModal({ open: false, tipo: 'Ticket', savedTotal: undefined, savedImpuesto: undefined, savedItems: undefined, savedClientName: undefined });
+    fetchArticles('', 'all', 0);
   };
 
   const cartColumns = [
@@ -415,7 +421,8 @@ export const MainSale = () => {
       <Modal
         title={<span style={{ fontSize: 14 }}>✅ Venta — Q{(resultModal.savedTotal ?? total).toFixed(2)}</span>}
         open={resultModal.open}
-        onCancel={() => setResultModal({ open: false, tipo: 'Ticket', savedTotal: undefined, savedImpuesto: undefined, savedItems: undefined, savedClientName: undefined })}
+        onOk={() => setResultModal({ open: false, tipo: 'Ticket' })}
+        okText="Cerrar"
         footer={
           <Space>
             {resultModal.tipo === 'Ticket' ? (
@@ -463,10 +470,11 @@ export const MainSale = () => {
                 printPdf(URL.createObjectURL(resp.data));
               }}>Imprimir</Button>
             )}
-            <Button type="primary" onClick={() => setResultModal({ open: false, tipo: 'Ticket', savedTotal: undefined, savedImpuesto: undefined, savedItems: undefined, savedClientName: undefined })}>Nueva Venta</Button>
+            <Button type="primary" onClick={closeResultModal}>Nueva Venta</Button>
           </Space>
         }
         width={600}
+        onCancel={closeResultModal}
         destroyOnHidden
       >
         <Descriptions column={1} bordered size="small">

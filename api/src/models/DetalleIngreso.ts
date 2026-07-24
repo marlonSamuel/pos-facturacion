@@ -23,11 +23,6 @@ export const DetalleIngreso = sequelize.define('DetalleIngreso', {
   precio_compra: {
     type: DataTypes.DECIMAL(11, 2),
     allowNull: false
-  },
-  precio_venta: {
-    type: DataTypes.DECIMAL(11, 2),
-    allowNull: true,
-    defaultValue: null
   }
 }, {
   tableName: 'detalle_ingreso',

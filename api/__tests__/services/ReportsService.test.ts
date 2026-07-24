@@ -3,6 +3,7 @@
  */
 jest.mock('../../src/common/request-context', () => ({
   sucursalFilter: () => ({}),
+  comercioFilter: () => ({ idcomercio: 1 }),
   getSucursalId: () => 1,
 }));
 
@@ -71,6 +72,15 @@ describe('ReportsService', () => {
       ]);
       const result = await service.getPurchases('2000-01-01', '2100-12-31');
       expect((result.rows[0] as any).motivo_anulacion).toBe('Error en compra');
+    });
+  });
+
+  describe('getInventory', () => {
+    it('debe filtrar articulos por idcomercio', async () => {
+      mockQuery.mockResolvedValue([]);
+      await service.getInventory();
+      const sql = mockQuery.mock.calls[0][0] as string;
+      expect(sql).toContain('a.idcomercio = :idcomercio');
     });
   });
 

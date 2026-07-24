@@ -130,7 +130,7 @@ export class ArticleService {
   async getLastPurchasePrice(articleId: number) {
     try {
       const [row] = await sequelize.query(
-        `SELECT di.precio_compra, di.precio_venta FROM detalle_ingreso di
+        `SELECT di.precio_compra FROM detalle_ingreso di
          JOIN ingreso i ON di.idingreso = i.idingreso
          WHERE di.idarticulo = :idarticulo
          ORDER BY di.iddetalle_ingreso DESC LIMIT 1`,
@@ -139,8 +139,7 @@ export class ArticleService {
       return {
         precio_compra: (row as any)?.precio_compra
           ? parseFloat((row as any).precio_compra) : null,
-        precio_venta: (row as any)?.precio_venta
-          ? parseFloat((row as any).precio_venta) : null
+        precio_venta: null
       };
     } catch (error: any) {
       throw new ApplicationException(error.message);
@@ -170,17 +169,40 @@ export class ArticleService {
         throw new ApplicationException('El precio de venta debe ser mayor a cero');
       }
       const payload: any = { idcomercio: getComercioId(), ...data };
-      const stockInicial = parseInt(payload.stock) || 0;
       delete payload.stock;
+      delete payload.stockPorSucursal;
       if (imagen) payload.imagen = imagen;
-      const article = await Articulo.create(payload);
-      const idarticulo = (article as any).idarticulo;
-      // Crear stock inicial en la sucursal activa
-      const idsucursal = getSucursalId();
-      if (idsucursal && stockInicial > 0) {
-        await ArticuloSucursal.create({ idarticulo, idsucursal, stock: stockInicial });
+
+      const transaction = await sequelize.transaction();
+      try {
+        const article = await Articulo.create(payload, { transaction });
+        const idarticulo = (article as any).idarticulo;
+        // Crear stock inicial en sucursales especificadas o en la activa
+        let stockPorSucursalRaw = (data as any).stockPorSucursal;
+        if (typeof stockPorSucursalRaw === 'string') {
+          try { stockPorSucursalRaw = JSON.parse(stockPorSucursalRaw); } catch { stockPorSucursalRaw = null; }
+        }
+        const stockPorSucursal = stockPorSucursalRaw as Record<string, number> | undefined;
+        if (stockPorSucursal && Object.keys(stockPorSucursal).length > 0) {
+          const entries = Object.entries(stockPorSucursal)
+            .filter(([, s]) => s > 0)
+            .map(([idSuc, stock]) => ({ idarticulo, idsucursal: parseInt(idSuc), stock }));
+          if (entries.length > 0) {
+            await ArticuloSucursal.bulkCreate(entries as any, { transaction });
+          }
+        } else {
+          const idsucursal = getSucursalId();
+          const stockInicial = parseInt((data as any).stock) || 0;
+          if (idsucursal && stockInicial > 0) {
+            await ArticuloSucursal.create({ idarticulo, idsucursal, stock: stockInicial }, { transaction });
+          }
+        }
+        await transaction.commit();
+        return article;
+      } catch (innerError) {
+        await transaction.rollback();
+        throw innerError;
       }
-      return article;
     } catch (error: any) {
       throw new ApplicationException(error.message);
     }

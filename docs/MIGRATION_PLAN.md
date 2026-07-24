@@ -438,6 +438,7 @@ Basado en el análisis del sistema legacy `inventarios/`:
 |------|--------|--------|
 | 5.1 | **Migration:** Crear tabla `ingreso` + `detalle_ingreso` | ✅ |
 | 5.2 | **Migration:** `precio_venta` nullable en `detalle_ingreso`, `precio_venta` en `articulo` | ✅ |
+| 5.2b | **Migration:** `DROP COLUMN precio_venta` en `detalle_ingreso` (ya no se usa en compras) | ✅ |
 | 5.3 | **Modelos:** `Ingreso` + `DetalleIngreso` con asociaciones | ✅ |
 | 5.4 | **PurchaseController:** CRUD + anular + listar detalle | ✅ |
 | 5.5 | **PurchaseService:** `create()` transaccional, `cancel()` con reversión de stock | ✅ |
@@ -464,15 +465,15 @@ Basado en el análisis del sistema legacy `inventarios/`:
 CREATE (transaccional):
   1. INSERT INTO ingreso (cabecera)
   2. INSERT INTO detalle_ingreso (detalles)
-  3. UPDATE articulo SET stock = stock + cantidad WHERE idarticulo = X
+  3. UPSERT articulo_sucursal SET stock = stock + cantidad
 
 CANCEL (transaccional):
   1. UPDATE ingreso SET estado = 'Anulado'
-  2. UPDATE articulo SET stock = stock - cantidad WHERE idarticulo = X
+  2. UPDATE articulo_sucursal SET stock = stock - cantidad
 ```
 
 **Detalles de implementación:**
-- Precio de venta ahora se almacena en `articulo.precio_venta` y es opcional en `detalle_ingreso.precio_venta`
+- ~~Precio de venta ahora se almacena en `articulo.precio_venta` y es opcional en `detalle_ingreso.precio_venta`~~ → **Eliminado:** `precio_venta` eliminado de `detalle_ingreso` (migración `20260727000001`). El precio de venta solo se gestiona desde el artículo.
 - El carrito de compra acumula cantidades si se agrega el mismo artículo dos veces
 - Artículos duplicados se filtran del dropdown al agregar a la compra (`excludeIds`)
 - Al crear artículo desde compra, stock se fuerza a 0 (se actualizará con la compra)
@@ -876,7 +877,7 @@ Para evitar backfill y riesgos, **los modelos Sequelize usarán exactamente los 
 | 5 | `articulo` | idarticulo, idcategoria, codigo, nombre (UNIQUE), stock, descripcion, imagen, condicion | categoria | Articles |
 | 6 | `persona` | idpersona, tipo_persona('Cliente'\|'Proveedor'), nombre, tipo_documento, num_documento, direccion, telefono, email | — | Persons |
 | 7 | `ingreso` | idingreso, idproveedor, idusuario, tipo_comprobante, serie_comprobante, num_comprobante, fecha_hora, impuesto, total_compra, estado('Aceptado'\|'Anulado'), tipo_ingreso('CA') | persona, usuario | Purchases |
-| 8 | `detalle_ingreso` | iddetalle_ingreso, idingreso, idarticulo, cantidad, precio_compra, precio_venta | ingreso, articulo | Purchases |
+| 8 | `detalle_ingreso` | iddetalle_ingreso, idingreso, idarticulo, cantidad, precio_compra | ingreso, articulo | Purchases |
 | 9 | `venta` | idventa, idcliente, idusuario, tipo_comprobante('Factura'\|'Ticket'), serie_comprobante, num_comprobante, fecha_hora, impuesto, total_venta, estado('Aceptado'\|'Anulado'), tipo_venta('CA') | persona, usuario | Sales |
 | 10 | `detalle_venta` | iddetalle_venta, idventa, idarticulo, cantidad, precio_venta, descuento | venta, articulo | Sales |
 | 11 | `token_dte` | id_token, token(TEXT), expira_en(DATE), otorgado_a | — | DTE |

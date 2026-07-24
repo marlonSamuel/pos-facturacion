@@ -1,6 +1,6 @@
 import { sequelize } from '../common/database/mysql';
 import { QueryTypes } from 'sequelize';
-import { sucursalFilter } from '../common/request-context';
+import { sucursalFilter, comercioFilter } from '../common/request-context';
 export class ReportsService {
   // â”€â”€â”€ Ventas por fecha/cliente/tipo â”€â”€â”€
   async getSales(from: string, to: string, cliente?: number, tipo?: string, estado?: string) {
@@ -165,6 +165,7 @@ export class ReportsService {
   // â”€â”€â”€ Inventario (stock completo) â”€â”€â”€
   async getInventory(categoria?: number, stockMin?: number) {
     const sf = sucursalFilter();
+    const cf = comercioFilter();
     let sql = `SELECT a.idarticulo, a.codigo, a.nombre, ars.stock, a.precio_venta,
                       c.nombre as categoria
                FROM articulo a
@@ -172,6 +173,7 @@ export class ReportsService {
                LEFT JOIN categoria c ON a.idcategoria = c.idcategoria
                WHERE 1=1`;
     const replacements: any = { idsucursal: sf.idsucursal || 1 };
+    if (cf.idcomercio) { sql += ' AND a.idcomercio = :idcomercio'; replacements.idcomercio = cf.idcomercio; }
     if (categoria) { sql += ' AND a.idcategoria = :categoria'; replacements.categoria = categoria; }
     if (stockMin !== undefined) { sql += ' AND ars.stock >= :stockMin'; replacements.stockMin = stockMin; }
     sql += ' ORDER BY a.nombre ASC';

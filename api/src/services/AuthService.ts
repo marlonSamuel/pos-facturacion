@@ -17,7 +17,7 @@ export class AuthService {
   }
   async login(loginDto: ILoginDto): Promise<ILoginResponse> {
     try {
-      const { username, password } = loginDto;
+      const { username, password, slug } = loginDto;
       const user = await Usuario.findOne({
         where: { login: username, condicion: 1 }
       });
@@ -28,6 +28,13 @@ export class AuthService {
       const isPasswordValid = await this.verifyPassword(password, userData.clave);
       if (!isPasswordValid) {
         throw new ApplicationException('Usuario o contraseña incorrectos', 401);
+      }
+      // Validar multi-tenant por subdominio
+      if (slug) {
+        const comercio = await Comercio.findByPk(userData.idcomercio);
+        if (!comercio || (comercio.get() as any).nickname !== slug) {
+          throw new ApplicationException('Usuario o contraseña incorrectos', 401);
+        }
       }
       const rolePermissions = await this.getRolePermissions(userData.idrol);
       const permisos = rolePermissions;

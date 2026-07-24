@@ -92,11 +92,10 @@ export class DteService {
    * Cada sucursal tiene su propio token por usuario (otorgado_a + idsucursal)
    */
   private async getToken(): Promise<string> {
-    const config = await this.getSucursalConfig();
     const sucId = getSucursalId();
     if (sucId) {
       const ultimo = await TokenDte.findOne({
-        where: { idsucursal: sucId, otorgado_a: config.usuarioLogin },
+        where: { idsucursal: sucId },
         order: [['id_token', 'DESC']]
       });
       if (ultimo) {

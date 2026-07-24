@@ -1,6 +1,7 @@
 export interface ILoginDto {
   username: string;
   password: string;
+  slug?: string;
 }
 
 export interface IUserDto {

@@ -1,7 +1,7 @@
 import { ApplicationException } from '../common/errors/application.exception';
 import { sequelize } from '../common/database/mysql';
 import { QueryTypes } from 'sequelize';
-import { sucursalFilter } from '../common/request-context';
+import { sucursalFilter, comercioFilter } from '../common/request-context';
 export class DashboardService {
   async getSummary() {
     try {
@@ -119,16 +119,21 @@ export class DashboardService {
     let stockBajo: any[] = [];
     try {
       const sf = sucursalFilter();
+      const cf = comercioFilter();
+      const comercioCond = cf.idcomercio ? 'AND idcomercio = :idcomercio' : '';
       const [cli]: any[] = await sequelize.query(
-        `SELECT COUNT(*) as total FROM persona WHERE tipo_persona = 'Cliente'`, { type: QueryTypes.SELECT }
+        `SELECT COUNT(*) as total FROM persona WHERE tipo_persona = 'Cliente' ${comercioCond}`, 
+        { type: QueryTypes.SELECT, replacements: { idcomercio: cf.idcomercio } }
       );
       clientes = cli?.total || 0;
       const [prov]: any[] = await sequelize.query(
-        `SELECT COUNT(*) as total FROM persona WHERE tipo_persona = 'Proveedor'`, { type: QueryTypes.SELECT }
+        `SELECT COUNT(*) as total FROM persona WHERE tipo_persona = 'Proveedor' ${comercioCond}`,
+        { type: QueryTypes.SELECT, replacements: { idcomercio: cf.idcomercio } }
       );
       proveedores = prov?.total || 0;
       const [art]: any[] = await sequelize.query(
-        `SELECT COUNT(*) as total FROM articulo`, { type: QueryTypes.SELECT }
+        `SELECT COUNT(*) as total FROM articulo WHERE 1=1 ${comercioCond}`,
+        { type: QueryTypes.SELECT, replacements: { idcomercio: cf.idcomercio } }
       );
       articulos = art?.total || 0;
       const sucursalCond = sf.idsucursal ? 'AND ars.idsucursal = :idsucursal' : '';

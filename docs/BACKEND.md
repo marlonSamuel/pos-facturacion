@@ -85,7 +85,7 @@ El server configura en orden:
 
 | Método | Ruta | Auth | Permiso | Descripción |
 |--------|------|------|---------|-------------|
-| POST | `/auth/login` | ❌ | — | Login con username + password |
+| POST | `/auth/login` | ❌ | — | Login con username + password + slug (opcional, valida multi-tenant por subdominio) |
 | GET | `/auth/me` | ✅ | — | Obtener usuario autenticado (incluye `idrol`, `rol`, `permisos`, `sucursales`) |
 | POST | `/auth/refresh-token` | ❌ | — | Rotar refresh token → nuevo access token |
 | POST | `/auth/cambiar-sucursal` | ✅ | — | Cambiar sucursal activa, emite nuevo JWT |
@@ -120,7 +120,7 @@ El server configura en orden:
 | GET | `/articles/active-for-sale` | ventas | Artículos activos con stock > 0 (para POS) |
 | GET | `/articles/:id` | inventario | Obtener por ID |
 | GET | `/articles/:id/last-purchase-price` | compras | Último precio de compra |
-| POST | `/articles` | inventario | Crear artículo (multipart: imagen) |
+| POST | `/articles` | inventario | Crear artículo (multipart: imagen, transaccional). `stockPorSucursal` (JSON opcional: `{"idSucursal": stock}`) asigna stock inicial a múltiples sucursales en la misma transacción |
 | PUT | `/articles/:id` | inventario | Actualizar artículo (multipart: imagen opcional) |
 | DELETE | `/articles/:id` | inventario | Desactivar artículo |
 
@@ -199,7 +199,7 @@ El server configura en orden:
 | GET | `/purchases` | compras | Listar compras |
 | GET | `/purchases/paginated?page=&pageSize=&estado=` | compras | Paginado — `estado` opcional: `Todas` (default), `Aceptado`, `Anulado` |
 | GET | `/purchases/:id` | compras | Obtener compra con detalle |
-| POST | `/purchases` | compras | Crear compra (transaccional, actualiza stock) — valida `precio_compra > 0`, `cantidad ≥ 1`, `precio_venta ≥ 0` |
+| POST | `/purchases` | compras | Crear compra (transaccional, actualiza stock) — valida `precio_compra > 0`, `cantidad ≥ 1` |
 | PUT | `/purchases/:id/cancel` | compras | Anular compra — body: `{ motivo_anulacion }` (reversión stock) |
 
 ### SaleController — `@route('/sales')`
